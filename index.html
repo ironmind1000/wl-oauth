@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whispered Legends — Authorization</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+         background:#0b1020; color:#eee; font-family:-apple-system,Segoe UI,Roboto,sans-serif; }
+  .card { width:min(560px,92vw); background:#141a2e; border:1px solid #2a3350; border-radius:16px;
+          padding:28px 26px; box-shadow:0 10px 40px rgba(0,0,0,.5); }
+  h1 { font-size:18px; margin:0 0 4px; color:#eee; }
+  p  { color:#9aa3bd; font-size:14px; margin:6px 0 16px; }
+  label { font-size:12px; color:#7e88a6; text-transform:uppercase; letter-spacing:.05em; }
+  textarea { width:100%; box-sizing:border-box; height:90px; margin:6px 0 14px; resize:none;
+             background:#0b1020; color:#ffd479; border:1px solid #2a3350; border-radius:10px;
+             padding:10px; font-family:ui-monospace,Menlo,monospace; font-size:13px; }
+  button { background:#ffc440; color:#1a1300; border:0; border-radius:10px; padding:11px 18px;
+           font-weight:700; font-size:14px; cursor:pointer; }
+  button:active { transform:translateY(1px); }
+  .ok { color:#7CFC9A; } .err { color:#ff6b6b; }
+  .moon { font-size:30px; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="moon">🌙</div>
+    <h1>Whispered Legends — Authorization</h1>
+    <p id="msg">Reading authorization response…</p>
+    <div id="codebox" style="display:none">
+      <label>Authorization code</label>
+      <textarea id="code" readonly></textarea>
+      <button id="copy">Copy code</button>
+      <span id="copied" class="ok" style="margin-left:10px"></span>
+    </div>
+  </div>
+<script>
+  var p = new URLSearchParams(location.search);
+  var code = p.get("code"), state = p.get("state"), err = p.get("error");
+  var msg = document.getElementById("msg");
+  if (err) {
+    msg.innerHTML = '<span class="err">Error: ' + err + ' — ' + (p.get("error_description")||"") + '</span>';
+  } else if (code) {
+    msg.innerHTML = '<span class="ok">Authorized.</span> Copy the code below and paste it back to Claude.';
+    document.getElementById("codebox").style.display = "block";
+    document.getElementById("code").value = code + (state ? ("\nstate=" + state) : "");
+    document.getElementById("copy").onclick = function(){
+      var t = document.getElementById("code"); t.select();
+      navigator.clipboard.writeText(t.value);
+      document.getElementById("copied").textContent = "copied ✓";
+    };
+  } else {
+    msg.textContent = "No authorization code in the URL. Start the sign-in flow from Claude.";
+  }
+</script>
+</body>
+</html>
